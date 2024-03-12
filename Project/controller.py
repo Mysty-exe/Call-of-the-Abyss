@@ -1,14 +1,14 @@
 import pygame
-import Project.helpers as helpers
 import sys
 from Project.view import View
+from Project.helpers import Helpers
 
 class GameInstance:
 
     def __init__(self):
         pygame.init()
 
-        self.title = helpers.GAME_TITLE
+        self.title = Helpers.title
         # self.icon = pygame.image.load('assets/icon.png')
 
         pygame.display.set_caption(self.title)
@@ -17,7 +17,7 @@ class GameInstance:
         self.game_state = 'Game'
         self.game = View()
 
-        self.fps = helpers.GAME_FPS
+        self.fps = Helpers.fps
         self.dt = self.fps
         self.clock = pygame.time.Clock()
 
