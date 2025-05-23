@@ -56,4 +56,5 @@ public:
     int getWidth();
     int getHeight();
     void clear();
+    void free();
 };

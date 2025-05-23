@@ -77,9 +77,9 @@ void Texture::free()
 
 void Texture::render(SDL_Renderer *renderer, Vector scroll, float zoom, float angle)
 {
-    SDL_Point point = {0, (int)(height / 2)};
-    SDL_Rect renderQuad = {(int)(x - scroll.x), (int)(y - scroll.y), (int)width * zoom, (int)height * zoom};
-    SDL_RenderCopyEx(renderer, texture, NULL, &renderQuad, angle, &point, SDL_FLIP_NONE);
+    SDL_FPoint point = {0, height / 2};
+    SDL_FRect renderQuad = {x - scroll.x, y - scroll.y, width * zoom, height * zoom};
+    SDL_RenderCopyExF(renderer, texture, NULL, &renderQuad, angle, &point, SDL_FLIP_NONE);
 }
 
 void Texture::setCoords(Vector pos)

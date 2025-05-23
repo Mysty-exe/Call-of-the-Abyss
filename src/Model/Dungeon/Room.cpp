@@ -12,7 +12,7 @@ Room::Room(SDL_Renderer *renderer, float width, float height, Player *player)
     this->height = height;
     this->player = player;
     discovered = true;
-    size = 15;
+    size = 40;
 
     northDoor = nullptr;
     southDoor = nullptr;
@@ -184,6 +184,10 @@ void Room::generateRoom()
     vector<Room *> doors = {northDoor, southDoor, eastDoor, westDoor};
     for (int i = 0; i < doors.size(); i++)
     {
+        if (doors[i] == nullptr)
+        {
+            continue;
+        }
         doorLocations.push_back(make_pair(getDoorLocation(i), getDoorTile(getDoorLocation(i)).getPos()));
     }
 }
@@ -295,19 +299,19 @@ Tile Room::getDoorTile(string doorType)
 {
     if (doorType == "North")
     {
-        return tiles[0][floor((tiles[0].size() - 1) / 2)];
+        return tiles[1][floor((tiles[1].size() - 1) / 2)];
     }
     if (doorType == "South")
     {
-        return tiles[tiles.size() - 1][floor((tiles[0].size() - 1) / 2)];
+        return tiles[tiles.size() - 2][floor((tiles[1].size() - 1) / 2)];
     }
     if (doorType == "East")
     {
-        return tiles[int((tiles.size() - 1) / 2)][tiles[int((tiles.size() - 1) / 2)].size() - 1];
+        return tiles[int((tiles.size() - 1) / 2)][tiles[int((tiles.size() - 1) / 2)].size() - 2];
     }
     if (doorType == "West")
     {
-        return tiles[int((tiles.size() - 1) / 2)][0];
+        return tiles[int((tiles.size() - 1) / 2)][1];
     }
 }
 
@@ -355,6 +359,14 @@ Tile Room::getSpawnableTile()
     return tiles[row][col];
 }
 
+void Room::addXpParticles(int amount, int xpAmount, Vector pos)
+{
+    for (int i = 0; i < amount; i++)
+    {
+        xpParticles.push_back(XP(renderer, pos + Vector(-25 + rand() % 51, -25 + rand() % 51), xpAmount / amount));
+    }
+}
+
 void Room::moveEntities(EventManager *eventManager, Camera &camera, double timeStep)
 {
     player->move(renderer, camera, eventManager, tiles, timeStep);
@@ -371,6 +383,12 @@ void Room::moveEntities(EventManager *eventManager, Camera &camera, double timeS
             if (player->weaponInRange(renderer, enemy->getRect()))
             {
                 enemy->dealDamage(player->getDamage());
+                if (enemy->getHealth() <= 0)
+                {
+                    addXpParticles(10, enemy->getXP(), enemy->getPos());
+                    enemy->free();
+                    delete enemy;
+                }
             }
         }
     }
@@ -399,6 +417,23 @@ void Room::display(EventManager *eventManager, Camera &camera)
         }
     }
 
+    SDL_SetRenderDrawColor(renderer, 88, 38, 148, 255);
+    for (XP &xp : xpParticles)
+    {
+        xp.moveXP(player->getPos());
+        xp.drawXP(renderer, camera.getOffset());
+        if (xp.isAbsorbed())
+        {
+            player->addXP(xp.getXP());
+        }
+    }
+
+    xpParticles.erase(
+        remove_if(xpParticles.begin(), xpParticles.end(),
+                  [](XP xp)
+                  { return xp.isAbsorbed(); }),
+        xpParticles.end());
+
     sort(entities.begin(), entities.end(), Entity::compareY);
     for (Entity *entity : entities)
     {
@@ -414,4 +449,36 @@ void Room::display(EventManager *eventManager, Camera &camera)
 vector<vector<Tile>> Room::getTiles()
 {
     return tiles;
+}
+
+void Room::free()
+{
+    delete player;
+    delete northDoor;
+    delete southDoor;
+    delete eastDoor;
+    delete southDoor;
+
+    for (Enemy *enemy : enemies)
+    {
+        enemy->free();
+        delete enemy;
+    }
+
+    for (Entity *entity : entities)
+    {
+        entity->free();
+        delete entity;
+    }
+
+    for (int i = 0; i < tiles.size(); i++)
+    {
+        for (Tile &tile : tiles[i])
+        {
+            tile.free();
+        }
+    }
+
+    enemies.clear();
+    entities.clear();
 }

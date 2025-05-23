@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "Weapon.h"
 #include "EventManager.h"
+#include "MessageManager.h"
 #include "Utilities.h"
 #include "Tile.h"
 #include "Timer.h"
@@ -26,9 +27,9 @@ enum PlayerState
 class Player : public Entity
 {
 private:
-    int skillpoints, energy, mana, maxEnergy, maxMana;
+    float skillpoints, energy, mana, maxEnergy, maxMana, currentXP;
     PlayerState playerState;
-    Timer dashTimer;
+    Timer dashTimer, regenerateTimer;
     bool canDash;
 
 public:
@@ -37,13 +38,15 @@ public:
     PlayerState getPlayerState();
     float getDamage();
     int getSkillPoints();
-    int getEnergy();
-    int getMaxEnergy();
-    int getMana();
-    int getMaxMana();
+    float getEnergy();
+    float getMaxEnergy();
+    float getMana();
+    float getMaxMana();
+    void addXP(float xp);
     bool isAttacking(EventManager *EventManager);
     void handleDash();
     void processEvents(EventManager *eventManager);
     bool weaponInRange(SDL_Renderer *renderer, SDL_FRect *rect);
+    void update(EventManager *eventManager, MessageManager *msgManager);
     void move(SDL_Renderer *renderer, Camera camera, EventManager *eventManager, vector<vector<Tile>> tiles, double timeStep);
 };

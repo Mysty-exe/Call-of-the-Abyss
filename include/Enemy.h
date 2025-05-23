@@ -29,6 +29,7 @@ public:
     Enemy(SDL_Renderer *renderer);
     EnemyState getEnemyState();
     void dealDamage(float damage);
+    float getXP();
     Vector seperate(vector<Entity *> entities, Player *player, double timeStep);
     void trackPlayer(vector<Entity *> entities, Player *player, Camera &camera, vector<vector<Tile>> tiles, double timeStep);
 };

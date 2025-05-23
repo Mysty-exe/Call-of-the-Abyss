@@ -6,12 +6,24 @@ Player::Player()
 
 Player::Player(SDL_Renderer *renderer) : Entity()
 {
+    Animation *W, *S, *A, *D, *WA, *WD, *SA, *SD;
     title = "Warrior";
     entityType = PLAYER;
     playerState = IDLE;
-    entity.loadFromFile(renderer, "Assets/Entities/player.png", 2.5);
-    width = entity.getWidth();
-    height = entity.getHeight();
+
+    W = new Animation(renderer, "Assets/Entities/Player/W", 2, 0.25);
+    S = new Animation(renderer, "Assets/Entities/Player/S", 2, 0.25);
+    A = new Animation(renderer, "Assets/Entities/Player/A", 2, 0.25);
+    D = new Animation(renderer, "Assets/Entities/Player/D", 2, 0.25);
+    WA = new Animation(renderer, "Assets/Entities/Player/WA", 2, 0.25);
+    WD = new Animation(renderer, "Assets/Entities/Player/WD", 2, 0.25);
+    SA = new Animation(renderer, "Assets/Entities/Player/SA", 2, 0.25);
+    SD = new Animation(renderer, "Assets/Entities/Player/SD", 2, 0.25);
+    entity = {W, S, A, D, WA, WD, SA, SD};
+    currentEntity = entity[1];
+
+    width = currentEntity->getWidth();
+    height = currentEntity->getHeight();
     playerState = IDLE;
     direction = Utilities::up;
     acceleration = 1;
@@ -31,6 +43,8 @@ Player::Player(SDL_Renderer *renderer) : Entity()
     skillpoints = 0;
 
     weapon = Axe(25, 0.1);
+
+    regenerateTimer.start();
 }
 
 PlayerState Player::getPlayerState()
@@ -48,30 +62,36 @@ int Player::getSkillPoints()
     return skillpoints;
 }
 
-int Player::getEnergy()
+float Player::getEnergy()
 {
     return energy;
 }
 
-int Player::getMaxEnergy()
+float Player::getMaxEnergy()
 {
     return maxEnergy;
 }
 
-int Player::getMana()
+float Player::getMana()
 {
     return mana;
 }
 
-int Player::getMaxMana()
+float Player::getMaxMana()
 {
     return maxMana;
 }
 
+void Player::addXP(float xp)
+{
+    currentXP += xp;
+}
+
 bool Player::isAttacking(EventManager *eventManager)
 {
-    if (eventManager->isLeftClick() && !weapon.isReloading())
+    if (eventManager->isLeftClick() && !weapon.isReloading() && energy >= 10)
     {
+        energy -= 10;
         weapon.attack();
         return true;
     }
@@ -80,19 +100,6 @@ bool Player::isAttacking(EventManager *eventManager)
 
 void Player::handleDash()
 {
-    if (!canDash)
-    {
-        if (!dashTimer.isStarted())
-        {
-            dashTimer.start();
-        }
-
-        if (dashTimer.getTicks() / 1000 >= 3)
-        {
-            canDash = true;
-        }
-    }
-
     if (playerState == DASHING)
     {
         acceleration = 50;
@@ -120,6 +127,7 @@ void Player::processEvents(EventManager *eventManager)
     }
 
     playerState = IDLE;
+    currentEntity->startAnimation();
 
     if (eventManager->checkHoldKeyEvent(W))
     {
@@ -163,8 +171,9 @@ void Player::processEvents(EventManager *eventManager)
         }
     }
 
-    if (eventManager->checkPressKeyEvent(SPACE) && canDash)
+    if (eventManager->checkPressKeyEvent(SPACE) && canDash && energy >= 40)
     {
+        energy -= 40;
         dashTimer.start();
         playerState = DASHING;
     }
@@ -173,6 +182,28 @@ void Player::processEvents(EventManager *eventManager)
 bool Player::weaponInRange(SDL_Renderer *renderer, SDL_FRect *rect)
 {
     return weapon.inRange(renderer, rect);
+}
+
+void Player::update(EventManager *eventManager, MessageManager *msgManager)
+{
+    processEvents(eventManager);
+
+    if (regenerateTimer.getTicks() / 1000 > 0.5)
+    {
+        energy += (5);
+        regenerateTimer.start();
+    }
+
+    energy = (energy < maxEnergy) ? energy : maxEnergy;
+    if (currentXP >= (100 * pow(level, 1.5)))
+    {
+        health = maxHealth;
+        level += 1;
+        skillpoints += 3;
+        currentXP -= (100 * pow(level, 1.5));
+        healthBar.setHealth(health, maxHealth);
+        msgManager->levelUp();
+    }
 }
 
 void Player::move(SDL_Renderer *renderer, Camera camera, EventManager *eventManager, vector<vector<Tile>> tiles, double timeStep)
@@ -190,6 +221,7 @@ void Player::move(SDL_Renderer *renderer, Camera camera, EventManager *eventMana
     prevPosition = position;
     position += direction.normalize() * velocity * timeStep;
     aimDirection = (eventManager->getMousePos() - (getPos() - camera.getOffset())).normalize();
+    setEntityDirection();
     checkEdge(tiles, timeStep);
 
     rect = {position.x - camera.getX(), position.y - camera.getY(), width, height};

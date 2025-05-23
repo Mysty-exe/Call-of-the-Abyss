@@ -89,12 +89,13 @@ void Floor::generateFloor()
 
 void Floor::moveEntities(EventManager *eventManager, MessageManager *msgManager, Camera &camera, double timeStep)
 {
+    player->update(eventManager, msgManager);
     currentRoom->moveEntities(eventManager, camera, timeStep);
 
     bool closeToDoor = false;
     for (pair<string, Vector> door : currentRoom->getDoorLocations())
     {
-        if (player->getPos().distance(door.second) < 50 && currentRoom->getPortalsActivated())
+        if (player->getPos().distance(door.second) < 100 && currentRoom->getPortalsActivated())
         {
             closeToDoor = true;
             msgManager->addMessage("Press E to Enter Room", 0);
@@ -362,4 +363,18 @@ void Floor::drawMap(int distance)
     roomTexture.loadFromFile(renderer, "Assets/Map/currentRoom.png", 1);
     roomTexture.setCoords(-roomTexture.getWidth() / 2, -roomTexture.getHeight() / 2);
     roomTexture.render(renderer, mapCamera.getOffset());
+}
+
+void Floor::free()
+{
+    currentRoom->free();
+    for (Room *room : rooms)
+    {
+        room->free();
+        delete room;
+    }
+
+    rooms.clear();
+
+    delete currentRoom;
 }

@@ -128,3 +128,10 @@ bool Tile::pointInTile(Vector P)
 
     return xabs / a + yabs / b <= 1.00;
 }
+
+void Tile::free()
+{
+    tile.free();
+    deactivatedPortal.free();
+    activatedPortal.freeAll();
+}

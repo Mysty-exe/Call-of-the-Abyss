@@ -30,4 +30,5 @@ public:
     void dragMap(Vector offset);
     bool isValidMap();
     void drawMap(int distance);
+    void free();
 };

@@ -21,7 +21,9 @@ public:
     Healthbar(SDL_Renderer *renderer, float health, float maxHealth);
     bool isDead();
     float getHealth();
+    void setHealth(float health, float maxHealth);
     void dealDamage(Vector pos, float damage);
     void displayDmgNumbers(Vector offset);
     void displayHealthbar(Vector pos, Vector size);
+    void free();
 };

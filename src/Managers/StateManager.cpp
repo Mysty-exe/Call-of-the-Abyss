@@ -72,3 +72,11 @@ void StateManager::updateDimensions(int w, int h)
         msgManager->resizeDimensions(w, h);
     }
 }
+
+void StateManager::free()
+{
+    cursor.free();
+    eventManager->free();
+    delete eventManager;
+    delete msgManager;
+}

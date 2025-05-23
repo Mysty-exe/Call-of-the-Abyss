@@ -23,17 +23,23 @@ float Healthbar::getHealth()
     return health;
 }
 
+void Healthbar::setHealth(float health, float maxHealth)
+{
+    this->health = health;
+    this->maxHealth = maxHealth;
+}
+
 void Healthbar::dealDamage(Vector pos, float damage)
 {
     Texture dmg;
     if (rand() % 10 == 0)
     {
         damage *= (1.5 + (rand() % 2));
-        dmg.loadFromRenderedText(renderer, font, to_string(int(damage)), {201, 150, 8}, int(damage) / 25);
+        dmg.loadFromRenderedText(renderer, font, to_string(int(damage)), {205, 69, 255}, int(damage) / 25);
     }
     else
     {
-        dmg.loadFromRenderedText(renderer, font, to_string(int(damage)), {201, 66, 32}, int(damage) / 25);
+        dmg.loadFromRenderedText(renderer, font, to_string(int(damage)), {88, 38, 148}, int(damage) / 25);
     }
 
     dmg.setCoords(pos + Vector(0, -(dmg.getHeight() + 5)));
@@ -84,4 +90,9 @@ void Healthbar::displayHealthbar(Vector pos, Vector size)
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDrawRectF(renderer, &rect);
+}
+
+void Healthbar::free()
+{
+    TTF_CloseFont(font);
 }

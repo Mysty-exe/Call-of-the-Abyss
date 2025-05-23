@@ -4,6 +4,15 @@ Animation::Animation()
 {
 }
 
+Animation::Animation(SDL_Renderer *renderer, string folder, float multiplier, double frameSecs)
+{
+    this->frameSecs = frameSecs;
+    this->folder = folder;
+    currentFrame = 0;
+    images = {};
+    loadFrames(renderer, multiplier);
+}
+
 void Animation::loadAnimation(SDL_Renderer *renderer, string folder, float multiplier, double frameSecs)
 {
     this->frameSecs = frameSecs;
@@ -24,9 +33,16 @@ void Animation::loadFrames(SDL_Renderer *renderer, float multiplier)
 
     for (int x = 1; x <= size; x++)
     {
-        Texture image;
-        image.loadFromFile(renderer, folder + "/" + to_string(x) + ".png", multiplier);
-        images.push_back(image);
+        try
+        {
+            Texture image;
+            image.loadFromFile(renderer, folder + "/" + to_string(x) + ".png", multiplier);
+            images.push_back(image);
+        }
+        catch (exception)
+        {
+            break;
+        }
     }
 }
 
@@ -46,7 +62,10 @@ void Animation::freeAll()
 
 void Animation::startAnimation()
 {
-    frameTimer.start();
+    if (!frameTimer.isStarted())
+    {
+        frameTimer.start();
+    }
 }
 
 void Animation::stopAnimation()

@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 
     StateManager stateManager = StateManager(renderer, WIDTH, HEIGHT);
     stateManager.run();
+    stateManager.free();
 
     SDL_FreeSurface(icon);
     SDL_DestroyRenderer(renderer);

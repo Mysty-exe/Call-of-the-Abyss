@@ -35,4 +35,5 @@ public:
     ManagerState getState();
     void run();
     void updateDimensions(int width, int height);
+    void free();
 };

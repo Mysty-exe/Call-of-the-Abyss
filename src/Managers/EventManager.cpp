@@ -204,3 +204,8 @@ void EventManager::clear()
     changedHeight = 0;
     leftClick = false;
 }
+
+void EventManager::free()
+{
+    delete keys;
+}

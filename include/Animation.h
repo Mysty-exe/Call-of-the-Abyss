@@ -18,6 +18,7 @@ private:
 
 public:
     Animation();
+    Animation(SDL_Renderer *renderer, string folder, float multiplier, double frameSecs);
     void loadAnimation(SDL_Renderer *renderer, string folder, float multiplier, double frameSecs);
     void loadFrames(SDL_Renderer *renderer, float multiplier);
     void startAnimation();

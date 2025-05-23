@@ -7,9 +7,9 @@ Enemy::Enemy()
 Enemy::Enemy(SDL_Renderer *renderer)
 {
     entityType = ENEMY;
-    entity.loadFromFile(renderer, "Assets/Entities/enemy.png", 2.5);
-    width = entity.getWidth();
-    height = entity.getHeight();
+    currentEntity = new Animation(renderer, "Assets/Entities/Enemies", 2.5, 0.1);
+    width = currentEntity->getWidth();
+    height = currentEntity->getHeight();
     acceleration = 1;
     maxVelocity = 20;
     knockback = Vector(0, 0);
@@ -33,6 +33,11 @@ void Enemy::dealDamage(float damage)
     healthBar.dealDamage(position + Vector(rand() % int(width), 0), damage);
     knockback = direction * -1;
     knockbackTimer.start();
+}
+
+float Enemy::getXP()
+{
+    return 50;
 }
 
 Vector Enemy::seperate(vector<Entity *> entities, Player *player, double timeStep)

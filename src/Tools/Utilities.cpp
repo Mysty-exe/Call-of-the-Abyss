@@ -65,9 +65,16 @@ Vector Utilities::getIsometricDirection(Vector direction, bool aiming)
     return newDirection.normalize();
 }
 
-void Utilities::displayMessage(SDL_Renderer *renderer, float width, float height, string text, int messageLevel)
+void Utilities::displayMessage(SDL_Renderer *renderer, float width, float height, string text, int messageLevel, bool bigger)
 {
-    message.loadFromRenderedText(renderer, TTF_OpenFont("Assets/Fonts/font.ttf", 30), text, {255, 255, 255});
+    if (bigger)
+    {
+        message.loadFromRenderedText(renderer, TTF_OpenFont("Assets/Fonts/font.ttf", 42), text, {88, 38, 148});
+    }
+    else
+    {
+        message.loadFromRenderedText(renderer, TTF_OpenFont("Assets/Fonts/font.ttf", 30), text, {255, 255, 255});
+    }
 
     int y = height - ((message.getHeight() + 30) * messageLevel);
     message.setCoords(width / 2 - message.getWidth() / 2, y);
@@ -76,4 +83,6 @@ void Utilities::displayMessage(SDL_Renderer *renderer, float width, float height
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
     SDL_RenderFillRect(renderer, &rect);
     message.render(renderer, Vector(0, 0));
+
+    message.free();
 }

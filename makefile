@@ -9,6 +9,7 @@ TARGET = build/main.exe
 SRC_FILES = src/main.cpp src/Tools/Utilities.cpp src/Tools/Timer.cpp src/Tools/Camera.cpp src/Math/Vector.cpp \
 			src/Managers/Manager.cpp src/Managers/MessageManager.cpp src/Managers/EventManager.cpp src/Managers/StateManager.cpp src/Managers/MenuManager.cpp src/Managers/GameManager.cpp src/Managers/SettingsManager.cpp \
 			src/Model/Entities/Entity.cpp src/Model/Entities/Player.cpp src/Model/Entities/Enemy.cpp \
+			src/Model/Items/XP.cpp \
 			src/Model/Dungeon/Floor.cpp src/Model/Dungeon/Room.cpp src/Model/Dungeon/Tile.cpp \
 			src/Model/Combat/Weapon.cpp \
 			src/UI/Texture.cpp src/UI/Animation.cpp src/UI/GameUI/Healthbar.cpp

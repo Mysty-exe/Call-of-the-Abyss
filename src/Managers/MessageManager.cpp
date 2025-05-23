@@ -15,6 +15,11 @@ void MessageManager::resizeDimensions(float width, float height)
     this->height = height;
 }
 
+void MessageManager::levelUp()
+{
+    levelUpTimer.start();
+}
+
 void MessageManager::addMessage(string msg, int type)
 {
     if (messages.size() >= 1)
@@ -41,5 +46,15 @@ void MessageManager::displayMessages(SDL_Renderer *renderer)
     for (int i = 0; i < messages.size(); i++)
     {
         Utilities::displayMessage(renderer, width, height, messages[i].second, i + 1);
+    }
+
+    if (levelUpTimer.isStarted())
+    {
+        Utilities::displayMessage(renderer, width, height, "LEVELED UP!", messages.size() + 1, true);
+    }
+
+    if (levelUpTimer.getTicks() / 1000 > 2)
+    {
+        levelUpTimer.reset();
     }
 }

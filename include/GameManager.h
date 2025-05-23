@@ -34,7 +34,7 @@ private:
     float zoomFactor, transparency;
     bool transitioning;
 
-    Texture dungeonSurface, mapSurface, minimapSurface, background;
+    Texture dungeonSurface, mapSurface, minimapSurface, bgLayer1, bgLayer2, bgLayer3;
     TTF_Font *font;
 
 public:
@@ -50,4 +50,5 @@ public:
     void runMap();
     void run(double timeStep);
     void updateDimensions(int width, int height);
+    void free();
 };

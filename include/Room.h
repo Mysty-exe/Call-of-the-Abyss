@@ -10,6 +10,7 @@
 #include "MessageManager.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "XP.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ private:
     vector<vector<Tile>> tiles;
     vector<Entity *> entities;
     vector<Enemy *> enemies;
+    vector<XP> xpParticles;
     Player *player;
     bool discovered;
 
@@ -57,7 +59,9 @@ public:
     Tile getTile(int row, int col);
     Tile getRandomTile();
     Tile getSpawnableTile();
+    void addXpParticles(int amount, int xpAmount, Vector pos);
     void moveEntities(EventManager *eventManager, Camera &camera, double timeStep);
     void display(EventManager *eventManager, Camera &camera);
     vector<vector<Tile>> getTiles();
+    void free();
 };

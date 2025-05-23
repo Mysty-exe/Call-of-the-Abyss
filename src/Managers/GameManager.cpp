@@ -11,7 +11,7 @@ GameManager::GameManager(SDL_Renderer *renderer, EventManager *eventManager, Mes
 
     state = DUNGEON;
     player = new Player(renderer);
-    floor = new Floor(renderer, width, height, 15, player);
+    floor = new Floor(renderer, width, height, 5, player);
     floors.push_back(floor);
     player->setPos(floor->getRoom()->getCenter().getPos());
     camera = Camera(width, height);
@@ -23,7 +23,15 @@ GameManager::GameManager(SDL_Renderer *renderer, EventManager *eventManager, Mes
     mapSurface.createRenderableTexture(renderer, width * 0.75, height * 0.75, SDL_TEXTUREACCESS_TARGET);
     mapSurface.setCoords(width / 2 - mapSurface.getWidth() / 2, -height * 0.75);
     minimapSurface.createRenderableTexture(renderer, width * 0.75, height * 0.75, SDL_TEXTUREACCESS_TARGET);
-    // background.loadFromFile(renderer, "Assets/bg.png", 1);
+
+    bgLayer1.loadFromFile(renderer, "Assets/Backgrounds/bgLayer1.png", 1);
+    bgLayer1.loadFromFile(renderer, "Assets/Backgrounds/bgLayer1.png", Vector(width / bgLayer1.getWidth(), height / bgLayer1.getHeight()));
+
+    bgLayer2.loadFromFile(renderer, "Assets/Backgrounds/bgLayer2.png", 1);
+    bgLayer2.loadFromFile(renderer, "Assets/Backgrounds/bgLayer2.png", Vector(width / bgLayer2.getWidth(), height / bgLayer2.getHeight()));
+
+    bgLayer3.loadFromFile(renderer, "Assets/Backgrounds/bgLayer3.png", 1);
+    bgLayer3.loadFromFile(renderer, "Assets/Backgrounds/bgLayer3.png", Vector(width / bgLayer3.getWidth(), height / bgLayer3.getHeight()));
 
     font = TTF_OpenFont("Assets/Fonts/font.ttf", 24);
 
@@ -37,39 +45,33 @@ Vector GameManager::getRenderOffset()
 
 void GameManager::drawBackground()
 {
-    int startX = 0;
-    if (-camera.getX() < 0)
+    int x;
+
+    x = 0 - bgLayer1.getWidth();
+    for (int i = 0; i < 3; i++)
     {
-        while (true)
-        {
-            startX -= background.getWidth();
-            if (startX < -camera.getX())
-            {
-                break;
-            }
-        }
+        bgLayer1.setCoords(Vector(x, 0));
+        bgLayer1.render(renderer, Vector(camera.getX() * 0.1, 0));
+
+        x += bgLayer1.getWidth();
     }
 
-    int startY = 0;
-    if (-camera.getY() < 0)
+    x = 0 - bgLayer2.getWidth();
+    for (int i = 0; i < 3; i++)
     {
-        while (true)
-        {
-            startY -= background.getHeight();
-            if (startY < -camera.getY())
-            {
-                break;
-            }
-        }
+        bgLayer2.setCoords(Vector(x, 0));
+        bgLayer2.render(renderer, Vector(camera.getX() * 0.3, 0));
+
+        x += bgLayer2.getWidth();
     }
 
-    for (int i = 0; i <= width; i += background.getWidth())
+    x = 0 - bgLayer3.getWidth();
+    for (int i = 0; i < 3; i++)
     {
-        for (int ii = 0; ii <= height; ii += background.getHeight())
-        {
-            // background.setCoords(Vector(i, ii));
-            // background.render(renderer, Vector(0, 0));
-        }
+        bgLayer3.setCoords(Vector(x, 0));
+        bgLayer3.render(renderer, Vector(camera.getX() * 0.5, 0));
+
+        x += bgLayer3.getWidth();
     }
 }
 
@@ -153,10 +155,10 @@ void GameManager::renderProfile()
     energyIcon.loadFromFile(renderer, "Assets/UI/Profile/energyIcon.png", 1.5);
     manaIcon.loadFromFile(renderer, "Assets/UI/Profile/manaIcon.png", 1.5);
 
-    SDL_SetRenderDrawColor(renderer, 18, 46, 89, 255);
+    SDL_SetRenderDrawColor(renderer, 44, 114, 212, 255);
     length = 300 * (player->getEnergy() / player->getMaxEnergy());
-    healthbarTxt.loadFromRenderedText(renderer, font, to_string(player->getEnergy()) + " / " + to_string(player->getMaxEnergy()), {255, 255, 255, 255}, 1);
-    healthbarOutline.loadFromFile(renderer, "Assets/UI/Profile/healthbar.png", Vector((305 * (player->getMaxHealth() / 100)) / 150, 40 / 20));
+    healthbarTxt.loadFromRenderedText(renderer, font, to_string((int)player->getEnergy()) + " / " + to_string((int)player->getMaxEnergy()), {255, 255, 255, 255}, 1);
+    healthbarOutline.loadFromFile(renderer, "Assets/UI/Profile/healthbar.png", Vector((305 * (player->getMaxEnergy() / 100)) / 150, 40 / 20));
     healthbar = {(float)profile.getEndX() + 15, (float)profile.getMiddleY() - 20, length, 40};
     healthbarOutline.setCoords(healthbar.x - 1, healthbar.y);
     energyIcon.setCoords(healthbarOutline.getMiddleX() - (healthbarTxt.getWidth() + energyIcon.getWidth() + 10) / 2, profile.getMiddleY() - energyIcon.getHeight() / 2);
@@ -181,7 +183,7 @@ void GameManager::renderProfile()
 
     SDL_SetRenderDrawColor(renderer, 68, 33, 95, 255);
     length = 300 * (player->getMana() / player->getMaxMana());
-    healthbarTxt.loadFromRenderedText(renderer, font, to_string(player->getMana()) + " / " + to_string(player->getMaxMana()), {255, 255, 255, 255}, 1);
+    healthbarTxt.loadFromRenderedText(renderer, font, to_string((int)player->getMana()) + " / " + to_string((int)player->getMaxMana()), {255, 255, 255, 255}, 1);
     healthbarOutline.loadFromFile(renderer, "Assets/UI/Profile/healthbar.png", Vector((305 * (player->getMaxMana() / 100)) / 150, 40 / 20));
     healthbar = {(float)profile.getEndX() - 5, (float)(profile.getY() + profile.getHeight() * 0.75 - 15), length, 40};
     healthbarOutline.setCoords(healthbar.x - 1, healthbar.y);
@@ -234,7 +236,7 @@ void GameManager::runUI()
     minimapSurface.setAsRenderTarget(renderer);
     SDL_RenderSetClipRect(renderer, &rect);
 
-    SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+    SDL_SetRenderDrawColor(renderer, 26, 25, 29, 255);
     SDL_RenderFillRect(renderer, &rect);
     floor->drawMap(100);
 
@@ -265,10 +267,10 @@ void GameManager::run(double timeStep)
     camera.centerOnPosition(camera.getCenter() + cameraOffset);
     camera.shakeScreen();
 
-    // drawBackground();
+    drawBackground();
 
     dungeonSurface.setAsRenderTarget(renderer);
-    SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
     if (state != MAP || mapSurface.getY() <= -height * 0.75)
@@ -306,7 +308,7 @@ void GameManager::run(double timeStep)
         mapSurface.setAsRenderTarget(renderer);
         SDL_RenderSetClipRect(renderer, &rect);
 
-        SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+        SDL_SetRenderDrawColor(renderer, 26, 25, 29, 255);
         SDL_RenderFillRect(renderer, &rect);
 
         runMap();
@@ -343,7 +345,30 @@ void GameManager::updateDimensions(int width, int height)
     floor->updateDimensions(width, height);
     floor->centerMap();
 
+    bgLayer1.loadFromFile(renderer, "Assets/Backgrounds/bgLayer1.png", 1);
+    bgLayer1.loadFromFile(renderer, "Assets/Backgrounds/bgLayer1.png", Vector(width / bgLayer1.getWidth(), height / bgLayer1.getHeight()));
+
+    bgLayer2.loadFromFile(renderer, "Assets/Backgrounds/bgLayer2.png", 1);
+    bgLayer2.loadFromFile(renderer, "Assets/Backgrounds/bgLayer2.png", Vector(width / bgLayer2.getWidth(), height / bgLayer2.getHeight()));
+
+    bgLayer3.loadFromFile(renderer, "Assets/Backgrounds/bgLayer3.png", 1);
+    bgLayer3.loadFromFile(renderer, "Assets/Backgrounds/bgLayer3.png", Vector(width / bgLayer3.getWidth(), height / bgLayer3.getHeight()));
+
     dungeonSurface.createRenderableTexture(renderer, width, height, SDL_TEXTUREACCESS_TARGET);
     mapSurface.createRenderableTexture(renderer, width * 0.75, height * 0.75, SDL_TEXTUREACCESS_TARGET);
     minimapSurface.createRenderableTexture(renderer, width * 0.75, height * 0.75, SDL_TEXTUREACCESS_TARGET);
+}
+
+void GameManager::free()
+{
+    for (Floor *floor : floors)
+    {
+        floor->free();
+        delete floor;
+    }
+
+    player->free();
+    delete player;
+
+    TTF_CloseFont(font);
 }

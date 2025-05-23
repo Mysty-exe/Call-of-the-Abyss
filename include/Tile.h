@@ -30,4 +30,5 @@ public:
     Vector getPos();
     void display(Camera camera);
     bool pointInTile(Vector P);
+    void free();
 };

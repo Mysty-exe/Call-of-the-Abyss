@@ -86,12 +86,53 @@ float Entity::getMaxHealth()
     return maxHealth;
 }
 
+void Entity::setEntityDirection()
+{
+    if (entity.size() < 2)
+    {
+        return;
+    }
+
+    if (Utilities::getIsometricDirection(aimDirection) == Utilities::up.normalize())
+    {
+        currentEntity = entity[0];
+    }
+    else if (Utilities::getIsometricDirection(aimDirection) == Utilities::down.normalize())
+    {
+        currentEntity = entity[1];
+    }
+    else if (Utilities::getIsometricDirection(aimDirection) == Utilities::left.normalize())
+    {
+        currentEntity = entity[2];
+    }
+    else if (Utilities::getIsometricDirection(aimDirection) == Utilities::right.normalize())
+    {
+        currentEntity = entity[3];
+    }
+    else if (Utilities::getIsometricDirection(aimDirection) == Utilities::upLeft.normalize())
+    {
+        currentEntity = entity[4];
+    }
+    else if (Utilities::getIsometricDirection(aimDirection) == Utilities::upRight.normalize())
+    {
+        currentEntity = entity[5];
+    }
+    else if (Utilities::getIsometricDirection(aimDirection) == Utilities::downLeft.normalize())
+    {
+        currentEntity = entity[6];
+    }
+    else if (Utilities::getIsometricDirection(aimDirection) == Utilities::downRight.normalize())
+    {
+        currentEntity = entity[7];
+    }
+}
+
 void Entity::display(SDL_Renderer *renderer, Camera camera, bool showHealthbar)
 {
     int drawX = static_cast<int>(round(position.x));
     int drawY = static_cast<int>(round(position.y));
-    entity.setCoords((int)drawX, (int)drawY);
-    entity.render(renderer, camera.getOffset());
+    currentEntity->setCoords((int)drawX, (int)drawY);
+    currentEntity->render(renderer, camera.getOffset());
 
     Vector pos = position - Vector(0, height / 5 + 10) - camera.getOffset();
     if (showHealthbar)
@@ -157,4 +198,15 @@ void Entity::dealDamage(float damage)
 {
     healthBar.dealDamage(position + Vector(rand() % int(width), 0), damage);
     health = healthBar.getHealth();
+}
+
+void Entity::free()
+{
+    for (Animation *e : entity)
+    {
+        e->freeAll();
+    }
+
+    currentEntity->freeAll();
+    healthBar.free();
 }

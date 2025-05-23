@@ -14,12 +14,13 @@ class MessageManager
 private:
     float width, height;
     vector<pair<int, string>> messages;
-    vector<Timer *> messageTimers;
+    Timer levelUpTimer;
 
 public:
     MessageManager();
     MessageManager(float width, float height);
     void resizeDimensions(float width, float height);
+    void levelUp();
     void addMessage(string msg, int type);
     void removeMessage(string msg);
     void displayMessages(SDL_Renderer *renderer);
